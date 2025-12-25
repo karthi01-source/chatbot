@@ -1,7 +1,7 @@
 import os
 import pickle
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 import faiss
 
 print("Script started...")
@@ -38,18 +38,55 @@ print("Splitting text into chunks...")
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000, # Max size of each chunk
     chunk_overlap=200, # How much chunks overlap
-    length_function=len
+    length_function=len,
+    is_separator_regex=False
 )
 chunks = text_splitter.split_text(raw_text)
 print(f"Created {len(chunks)} text chunks.")
 
-# --- 4. Load AI Model ---
-print(f"Loading model: {MODEL_NAME}...")
-model = SentenceTransformer(MODEL_NAME)
+# --- 4. Load AI Model (Cloud) ---
+import requests
+import json
+import time
+
+# --- IMPORTANT! PASTE YOUR KEY HERE (Or use env var) ---
+# Use the same key as in chatbot.py
+API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyD1o1ACeFFm6eyYmpJOvPHiuIjiv3dDWJc") 
+
+def get_embedding(text):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={API_KEY}"
+    payload = {
+        "model": "models/text-embedding-004",
+        "content": {
+            "parts": [{"text": text}]
+        }
+    }
+    headers = {'Content-Type': 'application/json'}
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(payload))
+        if response.status_code == 200:
+            return response.json()['embedding']['values']
+        else:
+            print(f"Error getting embedding: {response.text}")
+            return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 # --- 5. Create Embeddings ---
-print("Creating embeddings for chunks... (This may take a while)")
-embeddings = model.encode(chunks, show_progress_bar=True)
+print("Creating embeddings for chunks (Cloud)...")
+embeddings = []
+for i, chunk in enumerate(chunks):
+    emb = get_embedding(chunk)
+    if emb:
+        embeddings.append(emb)
+        print(f"Computed embedding for chunk {i+1}/{len(chunks)}")
+    else:
+        print(f"Skipping chunk {i+1} due to error.")
+    time.sleep(0.5) # Avoid rate limits
+
+import numpy as np
+embeddings = np.array(embeddings).astype('float32')
 print(f"Embeddings created with shape: {embeddings.shape}")
 
 # --- 6. Create and Save FAISS Vector Database ---

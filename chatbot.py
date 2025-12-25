@@ -2,7 +2,8 @@ import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 import pickle
 import faiss
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer # REMOVED
+import numpy as np
 from datetime import datetime
 import threading
 import requests
@@ -11,7 +12,7 @@ import time
 
 # --- Configuration ---
 LOG_FILE = 'unanswered_log.txt'
-MODEL_NAME = 'all-MiniLM-L6-v2'
+# MODEL_NAME = 'all-MiniLM-L6-v2' # REMOVED
 VECTOR_DB_PATH = "faiss_index"
 DATA_STORE_PATH = "data_store.pkl"
 
@@ -21,10 +22,30 @@ DATA_STORE_PATH = "data_store.pkl"
 API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyD1o1ACeFFm6eyYmpJOvPHiuIjiv3dDWJc") # Fallback to hardcoded for local test if needed, but prefer env var
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key={API_KEY}"
 
-# --- Load Model (This only happens once) ---
-print("Loading sentence transformer model...")
-model = SentenceTransformer(MODEL_NAME)
-print("Model loaded.")
+# --- Cloud Embedding Function ---
+def get_embedding(text):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={API_KEY}"
+    payload = {
+        "model": "models/text-embedding-004",
+        "content": {
+            "parts": [{"text": text}]
+        }
+    }
+    headers = {'Content-Type': 'application/json'}
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(payload), timeout=10)
+        if response.status_code == 200:
+            return response.json()['embedding']['values']
+        else:
+            print(f"Error getting embedding: {response.text}")
+            return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+# --- Load Model (Depreciated - Cloud used instead) ---
+print("Configured for Cloud Embeddings.")
+model = None # No local model
 
 # --- Global variables for our 'brain' ---
 index = None
@@ -154,7 +175,12 @@ def get_bot_response(user_question, chat_history):
         return "I'm sorry, my brain is not loaded. Please ask an admin to train me."
 
     try:
-        question_embedding = model.encode([user_question])
+        # question_embedding = model.encode([user_question]) # OLD
+        q_emb = get_embedding(user_question)
+        if q_emb is None:
+             return "I'm having trouble understanding (Embedding Error)."
+        
+        question_embedding = np.array([q_emb]).astype('float32')
         D, I = index.search(question_embedding, k=1)
         
         best_match_index = I[0][0]
