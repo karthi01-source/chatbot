@@ -9,6 +9,11 @@ app = Flask(__name__)
 UNANSWERED_LOG = 'unanswered_log.txt'
 FEEDBACK_LOG = 'feedback_log.txt'
 
+# --- Load Brain (Critical for Gunicorn) ---
+# Check if running in a main process to avoid double loading if not needed, 
+# but for simple gunicorn workers, loading at top level is safest.
+chatbot.load_brain() 
+
 # --- Feedback Logger ---
 def log_feedback(question, answer, feedback_type):
     try:
