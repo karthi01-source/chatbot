@@ -13,8 +13,9 @@ import time
 # --- Configuration ---
 LOG_FILE = 'unanswered_log.txt'
 # MODEL_NAME = 'all-MiniLM-L6-v2' # REMOVED
-VECTOR_DB_PATH = "faiss_index"
-DATA_STORE_PATH = "data_store.pkl"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+VECTOR_DB_PATH = os.path.join(BASE_DIR, "faiss_index")
+DATA_STORE_PATH = os.path.join(BASE_DIR, "data_store.pkl")
 
 # --- Gemini API Configuration ---
 # --- IMPORTANT! PASTE YOUR KEY HERE ---
