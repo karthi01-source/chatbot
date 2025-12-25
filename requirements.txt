@@ -1,0 +1,8 @@
+flask
+sentence-transformers
+faiss-cpu
+requests
+numpy
+langchain-text-splitters
+pyngrok
+gunicorn

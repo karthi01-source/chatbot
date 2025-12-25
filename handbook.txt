@@ -1,0 +1,477 @@
+UNIT-1
+Introduction: What is an Algorithm? Fundamentals of Algorithmic problem solving, Fundamentals of the Analysis of Algorithm Efficiency, Analysis Framework, Measuring the input size, Units for measuring Running time, Orders of Growth, Worst-case, Best case and Average-case efficiencies.
+
+INTRODUCTION
+What is an algorithm?
+Definition: An algorithm is defined as finite sequence of unambiguous instructions followed to accomplish a given task. It is also defined as unambiguous, step by step procedure (instructions) to solve a given problem in finite number of steps by accepting a set of inputs and producing the desired output. After producing the result, the algorithm should terminate.
+
+The properties of an algorithm: An algorithm must satisfy the following:
+Input: Each algorithm should have zero or more inputs. The range of inputs for which algorithm works should be satisfied
+Output: The algorithm should produce correct results. At least one output has to be produced.
+Definiteness: Each instruction should be clear and unambiguous.
+Effectiveness: The instructions should be simple and should transform the given input to the desired output.
+Finiteness: The algorithm must terminate after a finite sequence of instructions.
+
+Algorithm design and analysis process
+A sequence of steps involved in designing and analyzing an algorithm is shown:
+
+Understand the problem
+
+Decide on: computational means, exact vs. approximate solving, algorithm design technique
+
+Design an algorithm
+
+Prove correctness
+
+Analyze the algorithm
+
+Code the algorithm
+
+Understanding the Problem:
+Begin by clearly understanding the problem you are trying to solve. Identify the input, output, and constraints. This step is crucial for defining the scope of the algorithm.
+
+Deciding on Computational Device:
+Consider the computational device or model on which the algorithm will run. Different devices may have different resource constraints.
+
+Exact Vs. Approximate Algorithms:
+Decide whether an exact solution is necessary or if an approximate solution would suffice. Exact algorithms guarantee optimal solutions, while approximate algorithms provide solutions that are close to optimal but might be obtained faster.
+
+Algorithm Design Techniques:
+Choose appropriate algorithm design techniques. Common techniques include:
+
+Divide and Conquer: Break the problem into smaller subproblems and solve them independently.
+
+Dynamic Programming: Solve subproblems and store their solutions to avoid redundant computations.
+
+Greedy Algorithms: Make locally optimal choices at each step with the hope of finding a global optimum.
+
+Computing GCD
+Definition: The GCD (short form for Greatest Common Divisor) of two numbers m and n denoted by GCD(m,n) is defined as the largest integer that divides both m and n such that the remainder is zero.
+Different ways of computing GCD:
+
+Euclid's algorithm (Using modulus)
+
+Repetitive subtraction (Euclid's algorithm)
+
+Consecutive integer checking algorithm
+
+Middle school procedure using prime factors
+
+Units for measuring Running time
+Common units for measuring running time:
+
+Seconds (s): Actual time on a specific machine.
+
+Milliseconds (ms): Thousandths of a second.
+
+Microseconds (us): Millionths of a second.
+
+Nanoseconds (ns): Billionths of a second.
+
+Operations or Basic Steps: Abstract measure of complexity, independent of hardware.
+
+Big O Notation (O()): Represents the upper bound of an algorithm's time complexity.
+
+Instruction Count: The number of machine instructions executed.
+
+Comparisons or Swaps: For sorting algorithms.
+
+Analysis of algorithms
+The efficiency of an algorithm depends on two factors:
+
+Space efficiency
+
+Time efficiency
+
+What is space efficiency?
+Definition: The space efficiency of an algorithm is the amount of memory required to run the program completely and efficiently.
+Components that affect space:
+
+Program space: Space for storing the machine program.
+
+Data space: Space to store constants, variables, etc.
+
+Stack space: Space to store return addresses, parameters, local variables, etc.
+
+What is time efficiency?
+Definition: The time efficiency of an algorithm is measured purely on how fast a given algorithm is executed.
+Components that affect time efficiency:
+
+Speed of the computer
+
+Choice of the programming language
+
+Compiler used
+
+Choice of the algorithm
+Basic operation: The operation that contributes most towards the running time of the algorithm is called basic operation. The running time T(n) is given by: T(n) ~ b * C(n)
+Where T is running time, n is input size, b is execution time for basic operation, and C is the number of times basic operation is executed.
+
+Order of growth
+Definition: The change in behaviour of the algorithm and algorithm's efficiency can be analyzed by considering the highest order of n.
+Common computing time functions:
+
+1 (constant)
+
+log N (logarithmic)
+
+N (linear)
+
+N log N
+
+N^2 (quadratic)
+
+N^3 (cubic)
+
+2^N (exponential)
+
+N! (factorial)
+Order of growth from lowest to highest:
+1 < log(n) < n < n*log(n) < n^2 < n^3 < 2^n < n!
+
+Worst-case, Best-case and average case efficiencies
+Worst-case efficiency: The efficiency of an algorithm for the input of size n for which the algorithm takes longest time to execute. Time complexity is O(n).
+Best-case efficiency: The efficiency of an algorithm for the input of size n for which the algorithm takes least time during execution. Time complexity is O(1).
+Average-case efficiency: The scenario where the algorithm takes an average amount of time to complete. Time complexity is O(n/2) which simplifies to O(n).
+
+UNIT 2
+Asymptotic Notations and Basic Efficiency classes, Informal Introduction, O-notation, Ω-notation, 0-notation, mathematical analysis of non-recursive algorithms, mathematical analysis of recursive algorithms.
+
+Asymptotic notations
+Asymptotic notations are the notations using which two algorithms can be compared with respect to efficiency based on the order of growth.
+Types of asymptotic notations:
+
+O (Big Oh)
+
+Ω (Big Omega)
+
+Θ (Big Theta)
+
+O (Big-Oh)
+Definition: Let f(n) be the time efficiency of an algorithm. The function f(n) is said to be O(g(n)) if and only if there exists a positive constant c and positive integer n0 such that the constraint f(n) <= c*g(n) for all n >= n0.
+Big-O is the formal method of expressing the upper bound of an algorithm's running time.
+
+Ω (Big-Omega)
+Definition: Let f(n) be the time complexity of an algorithm. The function f(n) is said to be Ω(g(n)) if and only if there exists a positive constant c and non-negative integer n0 satisfying the constraint f(n) >= c*g(n) for all n >= n0.
+Big-Omega notation is used for finding best case time efficiency.
+
+Θ (Big-Theta)
+Definition: Let f(n) be the time complexity of an algorithm. The function f(n) is said to be Θ(g(n)) if and only if there exists some positive constants c1, c2 and non-negative integer n0 satisfying the constraint c1g(n) <= f(n) <= c2g(n) for all n >= n0.
+This notation is used to denote both lower bound and upper bound on a function f(n).
+
+Mathematical analysis of non-recursive algorithms
+General plan:
+
+Decide on the parameter for input size.
+
+Identify the basic operation.
+
+Check if the number of basic operations depends only on input size (otherwise, find worst, best, average cases).
+
+Obtain the total number of times a basic operation is executed.
+
+Simplify using standard formula and obtain the order of growth.
+
+Example: Maximum of n elements
+ALGORITHM Maximum(a[], n)
+pos <- 0
+for i <- 1 to n-1 do
+if (a[i] > a[pos]) pos <- i
+end for
+return pos
+Analysis: The basic operation is the comparison "if (a[i] > a[pos])".
+The total number of times it is executed is f(n) = Σ(from i=1 to n-1) of 1 = (n-1)-1+1 = n-1.
+So, f(n) is in O(n).
+
+Mathematical analysis of recursive algorithms
+Recursion: A method of solving the problem where the solution depends on solutions to smaller instances of the same problem.
+Direct recursion: A function that invokes itself.
+Indirect recursion: A function (f1) calls another function (f2), which eventually calls the first function (f1).
+Base Case: A special case where solution can be obtained without using recursion.
+General Case: The part of the function except base case, contains logic to reduce the size of the problem.
+
+Example: Factorial of a number
+Recursive definition: F(n) = 1 if n=0, and F(n) = n * F(n-1) otherwise.
+Analysis: Basic operation is multiplication.
+Recurrence relation: t(n) = 1 + t(n-1) for n>0, and t(0) = 0.
+Solving this, t(n) = n. So, the time complexity is t(n) in Θ(n).
+
+Example: Tower of Hanoi
+Problem: Move n discs from source (A) to destination (C) using a temporary needle (B), following rules.
+Rules: Only one disc moved at a time. Smaller disc always on top of larger disc.
+Base Case: if n=0, return.
+General Case:
+
+Move n-1 discs from source to temp.
+
+Move nth disc from source to destination.
+
+Move n-1 discs from temp to destination.
+Analysis: Basic operation is movement of a disk.
+Recurrence relation: t(n) = 2*t(n-1) + 1 for n>1, and t(1) = 1.
+Solving this, t(n) = 2^n - 1.
+So, the time complexity is t(n) in Θ(2^n).
+
+UNIT-3
+Brute Force & Exhaustive Search: Introduction to Brute Force approach, Selection Sort and Bubble Sort, Sequential search, Exhaustive Search- Travelling Salesman Problem and Knapsack Problem, Depth First Search, Breadth First Search
+
+Introduction to Brute Force approach
+Definition: The straight forward method of solving a given problem based on the problem's statement and definitions is called Brute Force technique.
+Advantages: Simple, easy to implement, applicable to a wide variety of problems.
+Disadvantages: Rarely yields efficient algorithms, can be unacceptably slow.
+
+Selection Sort
+Procedure: Find the smallest item in the list and exchange it with the first item. Find the second smallest and exchange it with the second item, and so on.
+Algorithm SelectionSort(arr, n)
+for i to n-2 do
+pos = i
+for j i+1 to n-1 do
+if (arr[j] < arr[pos]) pos <- j
+end for
+temp = arr[pos]
+arr[pos] = arr[i]
+arr[i] = temp
+end for
+Complexity: Time complexity is O(n^2) in all cases (Best, Average, Worst). Space complexity is O(1).
+
+Bubble Sort
+Procedure: Each pair of adjacent elements is compared and the elements are swapped if they are not in order.
+Algorithm BubbleSort(a[], n)
+for j 1 to n-1 do
+for i 0 to n-j-1 do
+if (a[i] > a[i+1]) then
+temp = a[i]
+a[i] = a[i+1]
+a[i+1] = temp
+end if
+end for
+end for
+Complexity: Best case O(n) (if already sorted), Average case O(n^2), Worst case O(n^2). Space complexity O(1).
+
+Sequential search:
+Procedure: Search for a given key item in the list one after another.
+Algorithm LinearSearch (key, a[], n):
+a[n] = key
+i = 0
+while (a[i] != key) do
+i = i + 1
+end while
+if (i < n) then
+return i
+else
+return -1
+end if
+Complexity: Best Case: O(1) (key at start), Average Case: O(n), Worst Case: O(n) (key at end or not present).
+
+Traveling Sales Man Problem (TSP):
+Definition: Given n cities, a salesperson starts at a specified city, visits all n-1 cities only once and returns to the start. Objective is to find a route that minimizes the total cost.
+Brute Force approach: Generate all (n-1)! permutations of cities, calculate the cost of each, and select the shortest. This is an exhaustive search.
+
+Knapsack Problem Greedy Method (Fractional Knapsack)
+Definition: Given a knapsack of capacity m & n objects with weights W and profits P.
+Objective: Place objects (or fractions of objects) into the knapsack to maximize total profit, not exceeding capacity m.
+Greedy Method: Sort objects based on profit-to-weight ratio (P/W) in descending order. Add objects/fractions to the knapsack in this order until the knapsack is full.
+
+Knapsack 0/1 Problem:
+Definition: Items are either completely taken or not taken at all (no fractions). This is solved using dynamic programming.
+Recurrence Relation: V[i, j] = 0 if i=0 or j=0. V[i, j] = V[i-1, j] if wi > j. V[i, j] = max(V[i-1, j], V[i-1, j-wi] + Pi) if wi <= j.
+The optimal solution is found in V[n, M].
+
+Depth First Search (DFS)
+Procedure: A graph traversal method that searches deeper in the graph.
+
+Uses a Stack.
+
+Start at a vertex, push it to the stack, and mark as visited.
+
+Push an unvisited adjacent vertex to the stack. Repeat.
+
+If no unvisited adjacent vertex, pop the vertex from the stack (this is a "dead end").
+
+Repeat until the stack is empty.
+
+Breadth First Search (BFS)
+Procedure: A graph traversal algorithm that explores all neighboring nodes at the present level before moving on to the next level.
+
+Uses a Queue.
+
+Start at a vertex, enqueue it, and mark as visited.
+
+Dequeue a vertex.
+
+Enqueue all its unvisited neighbors and mark them as visited.
+
+Repeat until the queue is empty.
+
+UNIT-4
+Decrease-and-Conquer: Introduction, Insertion Sort, Topological Sorting
+Divide-and-Conquer: Introduction, Merge Sort, Quick Sort, Binary Search, Binary Tree traversals and related properties.
+
+Decrease-and-Conquer:
+Definition: A method of solving a problem by:
+
+Changing the problem from a larger instance to a smaller instance (e.g., n to n-1 or n/2).
+
+Conquer (solve) the smaller problem.
+
+Convert the solution of the smaller problem into a solution for the original problem.
+Three Major variations:
+
+Decrease by constant (e.g., Insertion Sort)
+
+Decrease by constant factor (e.g., Binary Search)
+
+Variable size decrease (e.g., Euclid's GCD algorithm)
+
+Insertion Sort
+Procedure: The list is divided into a sorted part and an unsorted part. Each element from the unsorted part is taken and "inserted" into its correct position in the sorted part.
+Algorithm insertionSort(a, n)
+for i <- 1 to n-1
+item <- arr[i]
+j <- i-1
+while (j >= 0 and arr[j] > key)
+arr[j+1] <- arr[j]
+j <- j-1
+end while
+arr[j+1] <- key
+end for
+Complexity: Best Case: O(n) (if already sorted), Average Case: O(n^2), Worst Case: O(n^2).
+
+Topological Sorting
+Definition: A linear ordering of all vertices in a directed acyclic graph (DAG) such that for every directed edge (u, v), vertex u comes before vertex v in the ordering.
+Methods:
+
+DFS method: Perform DFS. The topological order is the reverse of the order in which vertices are popped from the stack (i.e., become dead ends).
+
+Source removal method: Repeatedly find a vertex with an in-degree of 0, add it to the solution, and remove it (and its outgoing edges) from the graph. Update the in-degrees of its neighbors. Repeat until no vertices are left.
+
+Divide-and-Conquer
+Definition: A top-down technique involving three steps:
+
+Divide: The problem is divided into a number of smaller subproblems.
+
+Conquer: The subproblems are solved recursively. If small enough, solve directly.
+
+Combine: The solutions of the subproblems are combined to get the solution for the original problem.
+
+Merge Sort
+Procedure: Divides the array into two halves, recursively sorts them, and then merges the two sorted halves.
+Algorithm MergeSort (A, low, high)
+if (low < high) then
+mid <- (low + high) / 2
+MergeSort (A, low, mid)
+MergeSort (A, mid + 1, high)
+SimpleMerge (A, low, mid, high)
+end if
+Complexity: Time complexity is O(n*log n) in all cases (Best, Average, Worst). Space complexity is O(n).
+
+Quick Sort
+Procedure: Picks an element as a "pivot," partitions the array around the pivot (elements smaller on the left, larger on the right), and then recursively sorts the two sub-arrays.
+Algorithm QuickSort(a, low, high)
+if (low < high) then
+k <- partition(a, low, high)
+QuickSort(a, low, k-1)
+QuickSort(a, k+1, high)
+end if
+Complexity: Best/Average Case: O(n*log n). Worst Case: O(n^2) (if pivot is always smallest/largest element).
+
+Binary Search
+Definition: A fast searching technique for a sorted list.
+Procedure: Compares the key with the middle element.
+
+If key matches, return.
+
+If key is smaller, search the left half.
+
+If key is larger, search the right half.
+Repeat until found or the search space is empty.
+Recurrence relation: t(n) = t(n/2) + 1.
+Complexity: Time complexity is O(log n).
+
+Binary Tree traversals
+
+Pre-order Traversal: root -> left -> right (A, B, D, E, C, F, G)
+
+Post-order Traversal: left -> right -> root (D, E, B, F, G, C, A)
+
+In-order Traversal: left -> root -> right (D, B, E, A, F, C, G)
+Properties of Binary Tree:
+
+Root: The highest node with no parent.
+
+Parent Node: The node that came before it.
+
+Child Node: The node that is a direct successor.
+
+Leaf: A node without children.
+
+Depth: Distance from the root.
+
+Height: Distance to the deepest node in its subtree.
+
+UNIT – 5
+Greedy Technique: Introduction, Prim’s Algorithm, Kruskal’s Algorithm, Dijkstra’s Algorithm, Lower-Bound Arguments, Decision Trees, P Problems, NP Problems, NP Complete Problems, Challenges of Numerical Algorithms.
+
+Greedy Technique
+Introduction: A simple, straightforward approach where a decision is taken on the basis of current available information (locally optimal choices) without worrying about the future.
+Used for optimization problems.
+
+Spanning Tree
+Definition: A subgraph G' of a graph G that connects all vertices (V' = V) and is acyclic (a tree).
+Minimum Spanning Tree (MST): A spanning tree that has the minimum total weight among all possible spanning trees.
+
+Prim’s Algorithm
+Procedure: A greedy algorithm to find an MST.
+
+Start with any single vertex.
+
+Find all edges that connect the tree built so far to new, unvisited vertices.
+
+Select the edge with the minimum weight from this set and add it to the tree.
+
+Repeat step 2 and 3 until all vertices are in the tree.
+
+Kruskal’s Algorithm
+Procedure: A greedy algorithm to find an MST.
+
+Sort all the edges in the graph in non-decreasing order of their weight.
+
+Pick the smallest edge.
+
+Check if adding this edge forms a cycle with the spanning tree built so far.
+
+If no cycle is formed, include this edge. Else, discard it.
+
+Repeat until there are (V-1) edges in the spanning tree (where V is the number of vertices).
+
+Dijkstra’s Algorithm
+Definition: Solves the single-source shortest path problem. It computes the shortest distance from a given source vertex to all other vertices in a weighted graph.
+Procedure:
+
+Mark the source node with a current distance of 0 and the rest to INFINITY.
+
+Set the unvisited node with the smallest current distance as the current node.
+
+For each neighbor of the current node, "relax" the edge: add the current node's distance to the edge weight. If this is smaller than the neighbor's current distance, update it.
+
+Mark the current node as visited.
+
+Repeat from step 2 until all nodes are visited.
+
+Lower Bound Arguments:
+Definition: A lower bound refers to the minimum amount of time or space complexity required to solve a computational problem, independent of the algorithm.
+Example: Comparison sorting algorithms (like Merge Sort, Quicksort) have a lower bound of Ω(n log n).
+
+Decision Trees:
+Definition: A flowchart-like tree structure where each internal node represents a test on an attribute, each branch represents an outcome, and each leaf node represents a class label (decision).
+Used for supervised learning and classification.
+
+P, NP, and NP-complete problems
+
+P (Polynomial time): Problems that can be solved in polynomial time (e.g., Sorting, Shortest Path).
+
+NP (Nondeterministic Polynomial time): Problems where a solution can be verified in polynomial time. (e.g., Subset Sum, Traveling Salesman).
+
+NP-complete: The hardest problems in NP. If a polynomial-time solution is found for one, all NP problems can be solved in polynomial time. (e.g., Traveling Salesman, Knapsack 0/1).
+
+NP-hard: Problems that are at least as hard as NP-complete problems, but are not necessarily in NP (e.g., they might be decision problems).

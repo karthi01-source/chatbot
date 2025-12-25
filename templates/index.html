@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <!-- === NEW MATHJAX SCRIPT === -->
+    <!-- This library will render the math formulas -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+    // Configure MathJax to look for $...$ (inline) and $$...$$ (display)
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+    </script>
+    <!-- === END OF NEW SCRIPT === -->
+
+</head>
+<body>
+
+    <div class="chat-container">
+        <!-- New Header -->
+        <div class="chat-header">
+            <div class="header-left">
+                <!-- Simple SVG logo -->
+                <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path><path d="M12 12m-5 0a5 5 0 1 0 10 0 5 5 0 1 0-10 0"></path></svg>
+                <div class="header-title">
+                    <h2>College AI</h2>
+                    <span>Online</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <!-- Dark Mode Toggle -->
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                    <!-- Sun Icon -->
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zM12 5V3h0V1h0v2h0v2zM12 21v-2h0v-2h0v2h0v2zM4.22 5.64l1.42-1.42L3.36 1.93 1.93 3.36l1.42 1.42L4.22 5.64zM18.36 19.78l1.42-1.42 1.42 1.42-1.42 1.42-1.42-1.42zM19.78 5.64l-1.42-1.42 1.42-1.42 1.42 1.42-1.42 1.42zM5.64 19.78l-1.42-1.42-1.42 1.42 1.42 1.42 1.42-1.42zM1 12H3v0h2v0H3v0H1zM19 12H21v0h2v0H21v0H19z"></path></svg>
+                    <!-- Moon Icon -->
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.1 12.08C11.1 12.08 11.1 12.08 11.1 12.08C10.02 12.56 9 13.68 9 15c0 1.66 1.34 3 3 3c1.32 0 2.44-0.88 2.81-2.06c0 0 0 0 0 0c0.04-0.12 0.07-0.25 0.07-0.38c0-0.83-0.67-1.5-1.5-1.5c-0.13 0-0.26 0.02-0.38 0.07C12.56 12.98 13.68 12 15 12c0-1.66-1.34-3-3-3C10.32 9 9.2 10.02 8.72 11.1c0 0 0 0 0 0c-0.12 0.04-0.25 0.07-0.38 0.07c-0.83 0-1.5-0.67-1.5-1.5c0-0.13 0.02-0.26 0.07-0.38C6.02 9.2 5 10.32 5 12c0 1.66 1.34 3 3 3c1.32 0 2.44-0.88 2.81-2.06c0 0 0 0 0 0C10.85 12.82 10.97 12.7 11.1 12.62C11.1 12.62 11.1 12.62 11.1 12.62C11.1 12.62 11.1 12.62 11.1 12.62C11.1 12.49 11.1 12.29 11.1 12.08z"></path></svg>
+                </button>
+                <!-- Clear Chat Button -->
+                <button id="clear-btn" class="icon-btn" aria-label="Clear Chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-box" id="chat-box">
+            <!-- Bot welcome message -->
+            <div class="message bot-message" data-role="model">
+                <p>Hello! I'm the college AI assistant. How can I help you today?</p>
+            </div>
+        </div>
+
+        <div class="chat-input">
+             <!-- New Microphone Button -->
+            <button id="mic-btn" class="icon-btn" aria-label="Use Microphone">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1.2-9.1c0-.66.54-1.2 1.2-1.2.66 0 1.2.54 1.2 1.2l-.01 6.2c0 .66-.53 1.2-1.19 1.2s-1.2-.54-1.2-1.2V4.9zm6.5 6.1c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/>
+                </svg>
+            </button>
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-btn" class="icon-btn" aria-label="Send">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2 .01 7z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Link the JavaScript file -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
