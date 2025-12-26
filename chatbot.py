@@ -1,5 +1,7 @@
 import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
+from dotenv import load_dotenv
+load_dotenv()
 import pickle
 import faiss
 # from sentence_transformers import SentenceTransformer # REMOVED
@@ -20,7 +22,10 @@ DATA_STORE_PATH = os.path.join(BASE_DIR, "data_store.pkl")
 # --- Gemini API Configuration ---
 # --- IMPORTANT! PASTE YOUR KEY HERE ---
 # API_KEY = "AIzaSyD1o1ACeFFm6eyYmpJOvPHiuIjiv3dDWJc" # OLD HARDCODED KEY
-API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyD1o1ACeFFm6eyYmpJOvPHiuIjiv3dDWJc") # Fallback to hardcoded for local test if needed, but prefer env var
+# API_KEY = os.environ.get("GEMINI_API_KEY")
+API_KEY = os.getenv("GEMINI_API_KEY")
+if not API_KEY or API_KEY == "Paste_Your_Gemini_API_Key_Here":
+    print("WARNING: GEMINI_API_KEY not set in .env file.")
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key={API_KEY}"
 
 # --- Cloud Embedding Function ---

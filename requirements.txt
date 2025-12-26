@@ -5,3 +5,4 @@ numpy
 langchain-text-splitters
 pyngrok
 gunicorn
+python-dotenv

@@ -1,4 +1,6 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 import pickle
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 # from sentence_transformers import SentenceTransformer
@@ -51,7 +53,11 @@ import time
 
 # --- IMPORTANT! PASTE YOUR KEY HERE (Or use env var) ---
 # Use the same key as in chatbot.py
-API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyD1o1ACeFFm6eyYmpJOvPHiuIjiv3dDWJc") 
+# Use the same key as in chatbot.py
+API_KEY = os.getenv("GEMINI_API_KEY")
+if not API_KEY:
+    print("Error: GEMINI_API_KEY not set in .env file.")
+    exit() 
 
 def get_embedding(text):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={API_KEY}"
