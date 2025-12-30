@@ -146,6 +146,9 @@ def extract_text_from_pdf(filepath):
             if content:
                 text += content + "\n"
         print(f"✅ Successfully extracted {len(text)} characters from {os.path.basename(filepath)}.")
+        if len(text.strip()) < 50:
+            print(f"⚠️ Warning: Very little text extracted ({len(text)} chars).")
+            print(f"   This PDF might be a scan (images only). OCR may be required.")
         return text
     except Exception as e:
         print(f"❌ Error extracting text from PDF {filepath}: {e}")

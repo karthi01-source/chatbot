@@ -17,6 +17,13 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 UNANSWERED_LOG = 'unanswered_log.txt'
 FEEDBACK_LOG = 'feedback_log.txt'
 
+# --- Ingestion Status Tracking ---
+INGESTION_STATUS = {
+    'status': 'Idle',
+    'last_run': None,
+    'error': None
+}
+
 # --- Load Brain (Critical for Gunicorn) ---
 # Removed top-level load to prevent hang
 
@@ -140,16 +147,32 @@ def upload_doc():
             saved_count += 1
     
     if saved_count > 0:
-        # Trigger Ingestion - Rebuild from all files (only once)
-        success = ingest.rebuild_brain(app.config['UPLOAD_FOLDER'])
-        
-        if success:
-            chatbot.load_brain() # Reload the brain
-            return redirect(url_for('admin', status=f'Successfully uploaded {saved_count} files! Brain Reloaded.'))
-        else:
-            return redirect(url_for('admin', status='Files saved but ingestion failed. Check logs.'))
+        # Trigger Background Ingestion
+        def run_ingestion():
+            global INGESTION_STATUS
+            INGESTION_STATUS['status'] = 'Processing'
+            INGESTION_STATUS['last_run'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            INGESTION_STATUS['error'] = None
+            try:
+                success = ingest.rebuild_brain(app.config['UPLOAD_FOLDER'])
+                if success:
+                    chatbot.load_brain()
+                    INGESTION_STATUS['status'] = 'Success'
+                else:
+                    INGESTION_STATUS['status'] = 'Failed'
+                    INGESTION_STATUS['error'] = 'Ingestion produced no chunks (check file types/content)'
+            except Exception as e:
+                INGESTION_STATUS['status'] = 'Error'
+                INGESTION_STATUS['error'] = str(e)
+
+        threading.Thread(target=run_ingestion).start()
+        return redirect(url_for('admin', status=f'Uploaded {saved_count} files. Training started in background...'))
     
     return redirect(url_for('admin', status='No files were saved.'))
+
+@app.route('/ingest_status')
+def ingest_status():
+    return jsonify(INGESTION_STATUS)
 
 @app.route('/delete_doc/<filename>')
 def delete_doc(filename):

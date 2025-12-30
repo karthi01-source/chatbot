@@ -138,6 +138,14 @@
                 onclick="return confirm('Are you sure you want to clear all logs?');">Clear All Logs</a>
         </div>
 
+        <div id="status-card"
+            style="background: #e9ecef; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 5px solid #6c757d;">
+            <h2 style="margin-top: 0;">Training Status</h2>
+            <p>Status: <span id="ingest-status" style="font-weight: bold;">Checking...</span></p>
+            <p id="ingest-last-run" style="font-size: 0.9em; color: #666;"></p>
+            <p id="ingest-error" style="color: #dc3545; font-weight: bold; display: none;"></p>
+        </div>
+
         <div style="background: #e9ecef; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h2 style="margin-top: 0;">Update Knowledge Base</h2>
             <form action="/upload_doc" method="post" enctype="multipart/form-data"
@@ -212,6 +220,45 @@
             </div>
         </div>
     </div>
+    <script>
+        function checkStatus() {
+            fetch('/ingest_status')
+                .then(response => response.json())
+                .then(data => {
+                    const statusEl = document.getElementById('ingest-status');
+                    const lastRunEl = document.getElementById('ingest-last-run');
+                    const errorEl = document.getElementById('ingest-error');
+                    const cardEl = document.getElementById('status-card');
+
+                    statusEl.innerText = data.status;
+                    lastRunEl.innerText = data.last_run ? 'Last updated: ' + data.last_run : '';
+
+                    if (data.status === 'Processing') {
+                        statusEl.style.color = '#ff8800';
+                        cardEl.style.borderLeftColor = '#ff8800';
+                    } else if (data.status === 'Success') {
+                        statusEl.style.color = '#28a745';
+                        cardEl.style.borderLeftColor = '#28a745';
+                    } else if (data.status === 'Idle') {
+                        statusEl.style.color = '#6c757d';
+                    } else {
+                        statusEl.style.color = '#dc3545';
+                        cardEl.style.borderLeftColor = '#dc3545';
+                    }
+
+                    if (data.error) {
+                        errorEl.innerText = 'Error: ' + data.error;
+                        errorEl.style.display = 'block';
+                    } else {
+                        errorEl.style.display = 'none';
+                    }
+                });
+        }
+
+        // Poll every 3 seconds
+        setInterval(checkStatus, 3000);
+        checkStatus();
+    </script>
 </body>
 
 </html>
