@@ -14,9 +14,10 @@ import pypdf
 print("Script started...")
 
 # --- 1. Configuration ---
-VECTOR_DB_PATH = "faiss_index"
-DATA_STORE_PATH = "data_store.pkl"
-CACHE_PATH = "embeddings_cache.pkl"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+VECTOR_DB_PATH = os.path.join(BASE_DIR, "faiss_index")
+DATA_STORE_PATH = os.path.join(BASE_DIR, "data_store.pkl")
+CACHE_PATH = os.path.join(BASE_DIR, "embeddings_cache.pkl")
 MODEL_NAME = 'all-MiniLM-L6-v2'
 
 # --- IMPORTANT! PASTE YOUR KEY HERE (Or use env var) ---

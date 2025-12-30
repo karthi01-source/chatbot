@@ -3,12 +3,9 @@ __pycache__/
 .venv/
 *.pyc
 
-# Data and Indices
-data_store.pkl
-faiss_index
-embeddings_cache.pkl
-embeddings.pkl
-data_uploads/
+# Local Data and Temporary Settings (Ignored)
+# Keep only sensitive or machine-specific things ignored
+# data_store.pkl, faiss_index, etc. are now tracked for sync across devices
 
 # Debug and Test Scripts
 debug_*.py
