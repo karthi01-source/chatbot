@@ -1,18 +1,24 @@
+import os
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['FAISS_OPT_LEVEL'] = 'generic'
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import chatbot  # Import our chatbot logic
 from datetime import datetime
 import threading
-import os
 import re
+from werkzeug.utils import secure_filename
+import ingest
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'data_uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB limit
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 UNANSWERED_LOG = 'unanswered_log.txt'
 FEEDBACK_LOG = 'feedback_log.txt'
 
 # --- Load Brain (Critical for Gunicorn) ---
-# Check if running in a main process to avoid double loading if not needed, 
-# but for simple gunicorn workers, loading at top level is safest.
-chatbot.load_brain() 
+# Removed top-level load to prevent hang
 
 # --- Feedback Logger ---
 def log_feedback(question, answer, feedback_type):
@@ -94,7 +100,18 @@ def admin():
     feedback = parse_feedback_logs()
     unanswered.reverse()
     feedback.reverse()
-    return render_template('admin.html', unanswered_logs=unanswered, feedback_logs=feedback)
+    
+    # List uploaded files
+    uploaded_files = []
+    if os.path.exists(app.config['UPLOAD_FOLDER']):
+        supported_extensions = ('.txt', '.pdf')
+        uploaded_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) 
+                          if f.lower().endswith(supported_extensions)]
+        
+    return render_template('admin.html', 
+                           unanswered_logs=unanswered, 
+                           feedback_logs=feedback, 
+                           uploaded_files=uploaded_files)
 
 @app.route('/clear_logs')
 def clear_logs():
@@ -105,8 +122,74 @@ def clear_logs():
         print(f"Error clearing logs: {e}")
     return redirect(url_for('admin'))
 
+@app.route('/upload_doc', methods=['POST'])
+def upload_doc():
+    if 'file' not in request.files:
+        return redirect(url_for('admin', status='No file part'))
+    
+    files = request.files.getlist('file')
+    if not files or files[0].filename == '':
+        return redirect(url_for('admin', status='No selected files'))
+    
+    saved_count = 0
+    for file in files:
+        if file:
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            saved_count += 1
+    
+    if saved_count > 0:
+        # Trigger Ingestion - Rebuild from all files (only once)
+        success = ingest.rebuild_brain(app.config['UPLOAD_FOLDER'])
+        
+        if success:
+            chatbot.load_brain() # Reload the brain
+            return redirect(url_for('admin', status=f'Successfully uploaded {saved_count} files! Brain Reloaded.'))
+        else:
+            return redirect(url_for('admin', status='Files saved but ingestion failed. Check logs.'))
+    
+    return redirect(url_for('admin', status='No files were saved.'))
+
+@app.route('/delete_doc/<filename>')
+def delete_doc(filename):
+    filename = secure_filename(filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    
+    if os.path.exists(filepath):
+        try:
+            os.remove(filepath)
+            # Rebuild brain after deletion
+            ingest.rebuild_brain(app.config['UPLOAD_FOLDER'])
+            chatbot.load_brain()
+            return redirect(url_for('admin', status=f'File {filename} deleted and brain updated.'))
+        except Exception as e:
+            return redirect(url_for('admin', status=f'Error deleting file: {e}'))
+    else:
+        return redirect(url_for('admin', status='File not found.'))
+
+@app.route('/delete_all_docs')
+def delete_all_docs():
+    try:
+        if os.path.exists(app.config['UPLOAD_FOLDER']):
+            for f in os.listdir(app.config['UPLOAD_FOLDER']):
+                if f.lower().endswith(('.txt', '.pdf')):
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], f))
+        
+        # Rebuild brain (which will now clear it)
+        ingest.rebuild_brain(app.config['UPLOAD_FOLDER'])
+        
+        # Update memory
+        chatbot.index = None
+        chatbot.chunks = []
+        
+        return redirect(url_for('admin', status='All documents deleted and brain cleared.'))
+    except Exception as e:
+        return redirect(url_for('admin', status=f'Error clearing documents: {e}'))
+
+
 # --- Run the App ---
 if __name__ == '__main__':
-    print("Starting Flask server...")
+    print("\n!!! STARTING FLASK SERVER ON http://127.0.0.1:5000 !!!\n")
     chatbot.load_brain()  # Load the FAISS brain
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

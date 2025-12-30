@@ -2,3 +2,19 @@
 __pycache__/
 .venv/
 *.pyc
+
+# Data and Indices
+data_store.pkl
+faiss_index
+embeddings_cache.pkl
+embeddings.pkl
+data_uploads/
+
+# Debug and Test Scripts
+debug_*.py
+test_*.py
+test_upload.txt
+sanity_check.py
+list_models.py
+models.txt
+run_public.py

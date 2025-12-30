@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
             padding: 20px;
             color: #333;
         }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -20,23 +22,27 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
+
         h1 {
             color: #007bff;
             border-bottom: 2px solid #007bff;
             padding-bottom: 10px;
             margin-top: 0;
         }
+
         h2 {
             color: #333;
             border-bottom: 1px solid #eee;
             padding-bottom: 5px;
             margin-top: 40px;
         }
+
         .log-section {
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
         }
+
         .log-box {
             flex: 1;
             min-width: 400px;
@@ -47,45 +53,55 @@
             max-height: 400px;
             overflow-y: auto;
         }
+
         .log-item {
             border-bottom: 1px solid #f0f0f0;
             padding: 10px 0;
         }
+
         .log-item:last-child {
             border-bottom: none;
         }
+
         .log-item .timestamp {
             font-size: 0.85em;
             color: #888;
             display: block;
         }
+
         .log-item .question {
             font-weight: 600;
             margin: 5px 0;
         }
+
         .log-item .answer {
             font-style: italic;
             color: #555;
             display: block;
             margin-top: 5px;
         }
+
         .log-item .type-up {
             color: green;
             font-weight: bold;
         }
+
         .log-item .type-down {
             color: red;
             font-weight: bold;
         }
+
         .empty-log {
             color: #999;
             font-style: italic;
         }
+
         .header-actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .btn {
             padding: 10px 15px;
             border: none;
@@ -95,63 +111,107 @@
             text-decoration: none;
             font-size: 0.9em;
         }
+
         .btn-danger {
             background-color: #dc3545;
         }
+
         .btn-danger:hover {
             background-color: #c82333;
         }
+
         .btn-primary {
             background-color: #007bff;
         }
+
         .btn-primary:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header-actions">
             <h1>Chatbot Admin Dashboard</h1>
-            <a href="/clear_logs" class="btn btn-danger" onclick="return confirm('Are you sure you want to clear all logs?');">Clear All Logs</a>
+            <a href="/clear_logs" class="btn btn-danger"
+                onclick="return confirm('Are you sure you want to clear all logs?');">Clear All Logs</a>
         </div>
+
+        <div style="background: #e9ecef; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h2 style="margin-top: 0;">Update Knowledge Base</h2>
+            <form action="/upload_doc" method="post" enctype="multipart/form-data"
+                style="display: flex; gap: 10px; align-items: center;">
+                <input type="file" name="file" accept=".txt,.pdf" multiple required>
+                <button type="submit" class="btn btn-primary">Upload & Retrain</button>
+            </form>
+            {% if request.args.get('status') %}
+            <p style="margin-top: 10px; font-weight: bold; color: #007bff;">{{ request.args.get('status') }}</p>
+            {% endif %}
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <h3 style="margin: 0;">Uploaded Files</h3>
+                {% if uploaded_files %}
+                <a href="/delete_all_docs" class="btn btn-danger" style="font-size: 0.8em; padding: 5px 10px;"
+                    onclick="return confirm('Are you sure you want to delete ALL documents? This cannot be undone.');">Delete
+                    All Documents</a>
+                {% endif %}
+            </div>
+            {% if uploaded_files %}
+            <ul style="list-style: none; padding: 0;">
+                {% for filename in uploaded_files %}
+                <li
+                    style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px; margin-bottom: 5px; border-radius: 4px; border: 1px solid #ddd;">
+                    <span>{{ filename }}</span>
+                    <a href="/delete_doc/{{ filename }}" class="btn btn-danger"
+                        style="font-size: 0.8em; padding: 5px 10px;"
+                        onclick="return confirm('Are you sure you want to delete this file? The brain will be retrained.');">Delete</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p style="color: #888; font-style: italic;">No uploaded documents found.</p>
+            {% endif %}
+        </div>
+
         <a href="/" class="btn btn-primary" style="margin-bottom: 20px;">Go to Chatbot</a>
 
         <div class="log-section">
             <div class="log-box">
                 <h2>Unanswered Questions Log</h2>
                 {% if unanswered_logs %}
-                    {% for log in unanswered_logs %}
-                        <div class="log-item">
-                            <span class="timestamp">{{ log.timestamp }}</span>
-                            <p class="question">{{ log.question }}</p>
-                        </div>
-                    {% endfor %}
+                {% for log in unanswered_logs %}
+                <div class="log-item">
+                    <span class="timestamp">{{ log.timestamp }}</span>
+                    <p class="question">{{ log.question }}</p>
+                </div>
+                {% endfor %}
                 {% else %}
-                    <p class="empty-log">No unanswered questions logged yet.</p>
+                <p class="empty-log">No unanswered questions logged yet.</p>
                 {% endif %}
             </div>
 
             <div class="log-box">
                 <h2>User Feedback Log</h2>
                 {% if feedback_logs %}
-                    {% for log in feedback_logs %}
-                        <div class="log-item">
-                            <span class="timestamp">{{ log.timestamp }}</span>
-                            {% if log.type == 'up' %}
-                                <span class="type-up">👍 UPVOTE</span>
-                            {% else %}
-                                <span class="type-down">👎 DOWNVOTE</span>
-                            {% endif %}
-                            <p class="question">Q: {{ log.question }}</p>
-                            <span class="answer">A: {{ log.answer }}</span>
-                        </div>
-                    {% endfor %}
+                {% for log in feedback_logs %}
+                <div class="log-item">
+                    <span class="timestamp">{{ log.timestamp }}</span>
+                    {% if log.type == 'up' %}
+                    <span class="type-up">👍 UPVOTE</span>
+                    {% else %}
+                    <span class="type-down">👎 DOWNVOTE</span>
+                    {% endif %}
+                    <p class="question">Q: {{ log.question }}</p>
+                    <span class="answer">A: {{ log.answer }}</span>
+                </div>
+                {% endfor %}
                 {% else %}
-                    <p class="empty-log">No user feedback logged yet.</p>
+                <p class="empty-log">No user feedback logged yet.</p>
                 {% endif %}
             </div>
         </div>
     </div>
 </body>
+
 </html>

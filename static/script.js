@@ -21,7 +21,7 @@ if (recognition) {
         try {
             recognition.start();
             userInput.placeholder = "Listening...";
-        } catch(e) { console.error("Speech recognition already active.", e); }
+        } catch (e) { console.error("Speech recognition already active.", e); }
     });
     recognition.onresult = (event) => {
         userInput.value = event.results[0][0].transcript;
@@ -82,11 +82,11 @@ function getChatHistory() {
     const messages = chatBox.querySelectorAll('.message');
     const history = [];
     // Get the last 4 messages (or fewer if not available)
-    const recentMessages = Array.from(messages).slice(-4); 
-    
+    const recentMessages = Array.from(messages).slice(-4);
+
     recentMessages.forEach(msg => {
         const role = msg.dataset.role; // We'll add this dataset attribute
-        const text = msg.querySelector('p').textContent;
+        const text = msg.querySelector('p') ? msg.querySelector('p').textContent : msg.querySelector('div').textContent; // Handle p or div
         if (role && text) {
             history.push({ "role": role, "parts": [{ "text": text }] });
         }
@@ -112,21 +112,21 @@ function sendMessage() {
     fetch('/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
             'question': userMessageText,
             'history': chatHistory  // Send the history
         }),
     })
-    .then(response => response.json())
-    .then(data => {
-        hideTypingIndicator();
-        appendMessage(data.answer, 'bot', userMessageText); 
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        hideTypingIndicator();
-        appendMessage('Sorry, something went wrong. Please try again.', 'bot');
-    });
+        .then(response => response.json())
+        .then(data => {
+            hideTypingIndicator();
+            appendMessage(data.answer, 'bot', userMessageText);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            hideTypingIndicator();
+            appendMessage('Sorry, something went wrong. Please try again.', 'bot');
+        });
 }
 
 // --- appendMessage function (with MathJax) ---
@@ -134,11 +134,22 @@ function appendMessage(message, sender, originalQuestion = null) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', `${sender}-message`);
     messageDiv.dataset.role = (sender === 'user') ? 'user' : 'model';
-    
-    const messageP = document.createElement('p');
-    // We use textContent. MathJax will find the delimiters ($$) in the text.
-    messageP.textContent = message;
+
+    const messageP = document.createElement('div'); // Changed to div for HTML content
+    // Render Markdown
+    if (sender === 'bot') {
+        messageP.innerHTML = marked.parse(message);
+    } else {
+        messageP.textContent = message;
+    }
     messageDiv.appendChild(messageP);
+
+    // Highlight Code Blocks
+    if (sender === 'bot') {
+        messageDiv.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
+    }
 
     if (sender === 'bot') {
         messageDiv.innerHTML += createSpeakButton(message);
@@ -161,7 +172,7 @@ function appendMessage(message, sender, originalQuestion = null) {
         }
     }
     chatBox.appendChild(messageDiv);
-    
+
     // --- IMPORTANT: Tell MathJax to render the new message ---
     if (window.MathJax) {
         MathJax.typesetPromise([messageDiv]).catch((err) => console.log('MathJax typeset error:', err));
@@ -174,17 +185,15 @@ function appendMessage(message, sender, originalQuestion = null) {
 // --- Text-to-Speech Functions ---
 function createSpeakButton(text) {
     if (!speechSynthesis) return '';
-    // Use CSS.escape to handle special characters
-    return `<button class="speak-btn" onclick="speakText(this, \`${CSS.escape(text)}\`)">
+    // Use encodeURIComponent to safely pass text
+    return `<button class="speak-btn" onclick="speakText(this, decodeURIComponent('${encodeURIComponent(text)}'))">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
         </button>`;
 }
 
 function speakText(button, text) {
     if (speechSynthesis.speaking) speechSynthesis.cancel();
-    // Un-escape the text for the speech engine
-    const unescapedText = text.replace(/\\`/g, '`');
-    const utterance = new SpeechSynthesisUtterance(unescapedText);
+    const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
     utterance.onend = () => button.classList.remove('speaking');
     speechSynthesis.speak(utterance);
